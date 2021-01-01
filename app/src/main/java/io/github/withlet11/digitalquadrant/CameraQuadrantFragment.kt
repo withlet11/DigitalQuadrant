@@ -23,7 +23,7 @@ package io.github.withlet11.digitalquadrant
 
 
 import android.Manifest
-import android.app.AlertDialog
+// import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
@@ -40,6 +40,7 @@ import android.util.Size
 import android.view.*
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
@@ -656,7 +657,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
 
     class ErrorDialog : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            return AlertDialog.Builder(activity)
+            return AlertDialog.Builder(activity!!)
                 .setMessage(arguments?.getString(ARG_MESSAGE))
                 .setPositiveButton(
                     R.string.ok
@@ -679,7 +680,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
     class ConfirmationDialog : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val parent = parentFragment
-            return AlertDialog.Builder(activity).setMessage(R.string.requestPermission)
+            return AlertDialog.Builder(activity!!).setMessage(R.string.requestPermission)
                 .setPositiveButton(R.string.ok) { _, _ ->
                     parent?.requestPermissions(
                         arrayOf(Manifest.permission.CAMERA),
