@@ -1,7 +1,7 @@
-/**
+/*
  * CameralessQuadrantFragment.kt
  *
- * Copyright 2020 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2021 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,17 +23,14 @@ package io.github.withlet11.digitalquadrant
 
 import android.content.Context
 import android.hardware.Sensor
-import android.os.Bundle
-import android.os.Handler
-import android.os.VibrationEffect
-import android.os.Vibrator
+import android.os.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
 class CameralessQuadrantFragment : QuadrantFragment() {
     private lateinit var gridView: GridView
-    private val handler = Handler()
+    private val handler by lazy { Handler(Looper.getMainLooper()) }
     private lateinit var runnable: Runnable
     private lateinit var vibrator: Vibrator
 
@@ -69,11 +66,12 @@ class CameralessQuadrantFragment : QuadrantFragment() {
                     if (!gridView.isPaused) {
                         gridView.pause()
 
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             val vibrationEffect =
                                 VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE)
                             vibrator.vibrate(vibrationEffect)
                         } else {
+                            @Suppress("DEPRECATION")
                             vibrator.vibrate(300)
                         }
                     }

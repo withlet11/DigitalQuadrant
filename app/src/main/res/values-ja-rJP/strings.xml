@@ -7,7 +7,6 @@
     <string name="picture">写真</string>
     <string name="license">ライセンス</string>
     <string name="opensource_licenses">オープンソースライセンス</string>
-    <string name="autoHold">オートホールド</string>
     <string name="requestPermission">権限のリクエスト</string>
     <string name="description_info">詳細情報</string>
     <string name="intro_message">イントロ</string>

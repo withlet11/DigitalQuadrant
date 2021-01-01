@@ -1,7 +1,7 @@
-/**
+/*
  * MainActivity.kt
  *
- * Copyright 2020 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2021 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,6 +26,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
+import androidx.appcompat.widget.Toolbar
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
@@ -36,11 +38,33 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+        val toolbar: Toolbar = findViewById(R.id.my_toolbar)
+        toolbar.setTitle(R.string.app_name)
+        toolbar.inflateMenu(R.menu.menu_main)
+
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.item_licenses -> {
+                    startActivity(Intent(application, LicenseActivity::class.java))
+                }
+                R.id.item_credits -> {
+                    startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+                }
+            }
+            true
+        }
+
+        val switch: SwitchCompat = findViewById(R.id.view_switch)
+        switch.setOnCheckedChangeListener { _, isChecked ->
+            tabAdapter.isAutoHoldEnabled = isChecked
+        }
+
         val pager = findViewById<ViewPager2>(R.id.pager)
         pager.adapter = tabAdapter
         // supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    /*
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -63,4 +87,5 @@ class MainActivity : AppCompatActivity() {
 
         return true
     }
+     */
 }

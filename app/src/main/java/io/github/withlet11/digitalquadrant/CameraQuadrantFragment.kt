@@ -1,7 +1,7 @@
-/**
+/*
  * CameraQuadrantFragment.kt
  *
- * Copyright 2020 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2021 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,7 +23,6 @@ package io.github.withlet11.digitalquadrant
 
 
 import android.Manifest
-// import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
@@ -170,6 +169,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
     }
 
     private lateinit var reticleView: ReticleView
+
     // private val handler = Handler()
     private val handler by lazy { Handler(Looper.getMainLooper()) }
     private lateinit var runnable: Runnable
@@ -322,14 +322,18 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
                 val displaySize = Point()
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    context?.getSystemService(WindowManager::class.java)?.let { windowManager ->
+                    activity?.windowManager?.let { windowManager ->
                         val metrics: WindowMetrics = windowManager.currentWindowMetrics
                         val windowInsets: WindowInsets = metrics.windowInsets
-                        val insets = windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.navigationBars() or WindowInsets.Type.displayCutout())
-                        val insetsWidth = insets.right + insets.left
-                        val insetsHeight = insets.top + insets.bottom
-                        val bounds = metrics.bounds
-                        displaySize.set(bounds.width() - insetsWidth, bounds.height() - insetsHeight)
+                        val (insetsWidth, insetsHeight) = windowInsets.getInsetsIgnoringVisibility(
+                            WindowInsets.Type.navigationBars() or WindowInsets.Type.displayCutout()
+                        ).let { insets -> insets.right + insets.left to insets.top + insets.bottom }
+                        metrics.bounds.let { bounds ->
+                            displaySize.set(
+                                bounds.width() - insetsWidth,
+                                bounds.height() - insetsHeight
+                            )
+                        }
                     }
                 } else {
                     @Suppress("DEPRECATION")
@@ -488,63 +492,67 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
                 }.also { requestBuilder ->
                     // Here, we create a CameraCaptureSession for camera preview.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        val sessionContext = android.hardware.camera2.params.SessionConfiguration(SESSION_REGULAR,
-                            arrayListOf(OutputConfiguration(surface), OutputConfiguration(imageReader!!.surface)),
-                            Executors.newSingleThreadExecutor(),
-                            object : CameraCaptureSession.StateCallback() {
-                                override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
-                                    // The camera is already closed
-                                    cameraDevice?.let {
-                                        // When the session is ready, we start displaying the preview.
-                                        captureSession = cameraCaptureSession.also { session ->
-                                            try {
-                                                if (isManualFocusSupported) {
-                                                    requestBuilder.set(
-                                                        CaptureRequest.CONTROL_AF_MODE,
-                                                        CaptureRequest.CONTROL_AF_MODE_OFF
-                                                    )
-                                                    requestBuilder.set(
-                                                        CaptureRequest.LENS_FOCUS_DISTANCE,
-                                                        0f
-                                                    )
-                                                } else {
-                                                    requestBuilder.set(
-                                                        CaptureRequest.CONTROL_AF_MODE,
-                                                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
-                                                    )
-                                                }
-                                                // Flash is automatically enabled when necessary.
-                                                // setAutoFlash(requestBuilder)
-
-                                                // set max ISO
-                                                requestBuilder.set(
-                                                    CaptureRequest.SENSOR_SENSITIVITY,
-                                                    maxISO
-                                                )
-                                                println("max ISO: $maxISO")
-
-                                                // Finally, we start displaying the camera preview.
-                                                previewRequest =
-                                                    requestBuilder.build().also { request ->
-                                                        session.setRepeatingRequest(
-                                                            request,
-                                                            captureCallback, backgroundHandler
+                        val sessionContext =
+                            android.hardware.camera2.params.SessionConfiguration(SESSION_REGULAR,
+                                arrayListOf(
+                                    OutputConfiguration(surface),
+                                    OutputConfiguration(imageReader!!.surface)
+                                ),
+                                Executors.newSingleThreadExecutor(),
+                                object : CameraCaptureSession.StateCallback() {
+                                    override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
+                                        // The camera is already closed
+                                        cameraDevice?.let {
+                                            // When the session is ready, we start displaying the preview.
+                                            captureSession = cameraCaptureSession.also { session ->
+                                                try {
+                                                    if (isManualFocusSupported) {
+                                                        requestBuilder.set(
+                                                            CaptureRequest.CONTROL_AF_MODE,
+                                                            CaptureRequest.CONTROL_AF_MODE_OFF
+                                                        )
+                                                        requestBuilder.set(
+                                                            CaptureRequest.LENS_FOCUS_DISTANCE,
+                                                            0f
+                                                        )
+                                                    } else {
+                                                        requestBuilder.set(
+                                                            CaptureRequest.CONTROL_AF_MODE,
+                                                            CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
                                                         )
                                                     }
-                                            } catch (e: CameraAccessException) {
-                                                e.printStackTrace()
+                                                    // Flash is automatically enabled when necessary.
+                                                    // setAutoFlash(requestBuilder)
+
+                                                    // set max ISO
+                                                    requestBuilder.set(
+                                                        CaptureRequest.SENSOR_SENSITIVITY,
+                                                        maxISO
+                                                    )
+                                                    println("max ISO: $maxISO")
+
+                                                    // Finally, we start displaying the camera preview.
+                                                    previewRequest =
+                                                        requestBuilder.build().also { request ->
+                                                            session.setRepeatingRequest(
+                                                                request,
+                                                                captureCallback, backgroundHandler
+                                                            )
+                                                        }
+                                                } catch (e: CameraAccessException) {
+                                                    e.printStackTrace()
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                override fun onConfigureFailed(
-                                    cameraCaptureSession: CameraCaptureSession
-                                ) {
-                                    showToast("Failed")
+                                    override fun onConfigureFailed(
+                                        cameraCaptureSession: CameraCaptureSession
+                                    ) {
+                                        showToast("Failed")
+                                    }
                                 }
-                            }
-                        )
+                            )
                         device.createCaptureSession(sessionContext)
                     } else @Suppress("DEPRECATION") {
                         device.createCaptureSession(

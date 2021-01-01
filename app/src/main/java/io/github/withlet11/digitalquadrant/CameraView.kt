@@ -1,4 +1,4 @@
-/**
+/*
  * CameraView.kt
  *
  * Copyright 2020 Yasuhiro Yamakawa <withlet11@gmail.com>
