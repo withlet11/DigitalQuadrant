@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Digital Quadrant</string>
+    <string name="cancel">キャンセル</string>
+    <string name="ok">OK</string>
+    <string name="cameraError">カメラエラー</string>
+    <string name="picture">写真</string>
+    <string name="license">ライセンス</string>
+    <string name="opensource_licenses">オープンソースライセンス</string>
+    <string name="autoHold">オートホールド</string>
+    <string name="requestPermission">権限のリクエスト</string>
+    <string name="description_info">詳細情報</string>
+    <string name="intro_message">イントロ</string>
+</resources>
