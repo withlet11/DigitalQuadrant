@@ -19,20 +19,6 @@
           android:strokeColor="#00000000"
           android:strokeLineCap="square"/>
       <path
-          android:pathData="m78.711,271.037l200.441,-200.378l320.693,320.724l-200.441,200.378z"
-          android:fillColor="#000000"
-          android:fillAlpha="0.0157"
-          android:fillType="evenOdd"
-          android:strokeColor="#00000000"
-          android:strokeLineCap="square"/>
-      <path
-          android:pathData="m78.711,271.037l200.441,-200.378l320.693,320.724l-200.441,200.378z"
-          android:fillColor="#000000"
-          android:fillAlpha="0.0157"
-          android:fillType="evenOdd"
-          android:strokeColor="#00000000"
-          android:strokeLineCap="square"/>
-      <path
           android:pathData="m420.11,316.14l0,0c-135.241,78.084 -308.162,32.075 -386.717,-102.892l244.984,-142.588z"
           android:fillColor="#000000"
           android:fillAlpha="0"
