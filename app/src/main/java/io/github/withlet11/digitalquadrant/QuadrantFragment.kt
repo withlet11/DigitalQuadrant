@@ -118,7 +118,7 @@ open class QuadrantFragment : Fragment(), SensorEventListener {
         // get argument
         val args = arguments
         isAutoHoldEnabled = args?.getBoolean("IS_AUTOHOLD_ENABLED") ?: false
-        sensorManager = activity!!.applicationContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensorManager = requireActivity().applicationContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
     override fun onResume() {

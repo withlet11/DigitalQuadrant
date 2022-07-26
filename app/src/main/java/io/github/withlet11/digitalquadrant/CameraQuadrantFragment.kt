@@ -665,7 +665,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
 
     class ErrorDialog : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            return AlertDialog.Builder(activity!!)
+            return AlertDialog.Builder(requireActivity())
                 .setMessage(arguments?.getString(ARG_MESSAGE))
                 .setPositiveButton(
                     R.string.ok
@@ -688,7 +688,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
     class ConfirmationDialog : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val parent = parentFragment
-            return AlertDialog.Builder(activity!!).setMessage(R.string.requestPermission)
+            return AlertDialog.Builder(requireActivity()).setMessage(R.string.requestPermission)
                 .setPositiveButton(R.string.ok) { _, _ ->
                     parent?.requestPermissions(
                         arrayOf(Manifest.permission.CAMERA),
