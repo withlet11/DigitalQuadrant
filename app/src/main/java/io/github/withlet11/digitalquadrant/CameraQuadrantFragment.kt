@@ -39,6 +39,7 @@ import android.util.Size
 import android.view.*
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.core.content.ContextCompat
@@ -93,6 +94,22 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
             }
         }
     }
+
+    val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission is granted. Continue the action or workflow in your
+                // app.
+            } else {
+                // Explain to the user that the feature is unavailable because the
+                // features requires a permission that the user has denied. At the
+                // same time, respect the user's decision. Don't link to system
+                // settings in an effort to convince the user to change their
+                // decision.
+            }
+        }
 
     private val surfaceTextureListener: SurfaceTextureListener = object : SurfaceTextureListener {
         override fun onSurfaceTextureAvailable(texture: SurfaceTexture, width: Int, height: Int) {
@@ -247,7 +264,8 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
             ConfirmationDialog().show(childFragmentManager, FRAGMENT_DIALOG)
         } else {
-            requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
+            // requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
@@ -690,10 +708,13 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
             val parent = parentFragment
             return AlertDialog.Builder(requireActivity()).setMessage(R.string.requestPermission)
                 .setPositiveButton(R.string.ok) { _, _ ->
+                    /*
                     parent?.requestPermissions(
                         arrayOf(Manifest.permission.CAMERA),
                         REQUEST_CAMERA_PERMISSION
                     )
+                     */
+                    (parent as CameraQuadrantFragment).requestPermissionLauncher.launch(Manifest.permission.CAMERA)
                 }.setNegativeButton(R.string.cancel) { _, _ ->
                     val activity = parent?.activity
                     activity?.finish()
