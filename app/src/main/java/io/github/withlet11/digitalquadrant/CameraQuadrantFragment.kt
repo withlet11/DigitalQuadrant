@@ -269,6 +269,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
         }
     }
 
+    /*
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>,
         grantResults: IntArray
@@ -282,6 +283,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
     }
+     */
 
     private fun setUpCameraOutputs(width: Int, height: Int) {
         val manager =
