@@ -22,6 +22,7 @@
 package io.github.withlet11.digitalquadrant
 
 import android.content.Context
+import android.content.Context.VIBRATOR_SERVICE
 import android.hardware.Sensor
 import android.os.*
 import android.view.LayoutInflater
@@ -33,6 +34,7 @@ class CameralessQuadrantFragment : QuadrantFragment() {
     private val handler by lazy { Handler(Looper.getMainLooper()) }
     private lateinit var runnable: Runnable
     private lateinit var vibrator: Vibrator
+    private lateinit var vibratorManager: VibratorManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,7 +48,14 @@ class CameralessQuadrantFragment : QuadrantFragment() {
         gridView = view.findViewById(R.id.canvas)
         gridView.setOnClickListener { gridView.togglePause() }
 
-        vibrator = requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            vibratorManager =
+                requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibrator = vibratorManager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator = requireContext().getSystemService(VIBRATOR_SERVICE) as Vibrator
+        }
     }
 
     override fun onResume() {
@@ -66,11 +75,21 @@ class CameralessQuadrantFragment : QuadrantFragment() {
                     if (!gridView.isPaused) {
                         gridView.pause()
 
-                        val vibrationEffect =
-                            VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE)
-                        vibrator.vibrate(vibrationEffect)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            val vibrationEffect =
+                                VibrationEffect.createOneShot(
+                                    300,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            vibrator.vibrate(vibrationEffect)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            vibrator.vibrate(300)
+                        }
                     }
-                } else gridView.setPosition(pitchY, rollY)
+                } else {
+                    gridView.setPosition(pitchY, rollY)
+                }
                 handler.postDelayed(this, PERIOD)
             }
         }

@@ -1,7 +1,7 @@
 /*
  * ReticleView.kt
  *
- * Copyright 2020 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2024 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -127,11 +127,6 @@ class ReticleView(context: Context?, attrs: AttributeSet?) : SurfaceView(context
 
     fun togglePause() {
         isPaused = !isPaused
-        invalidate()
-    }
-
-    fun pause() {
-        isPaused = true
         invalidate()
     }
 }

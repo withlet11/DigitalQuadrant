@@ -25,6 +25,7 @@ package io.github.withlet11.digitalquadrant
 import android.Manifest
 import android.app.Dialog
 import android.content.Context
+import android.content.Context.VIBRATOR_SERVICE
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.*
@@ -54,7 +55,6 @@ import kotlin.math.max
 
 class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCallback {
     companion object {
-        const val REQUEST_CAMERA_PERMISSION = 1
         const val FRAGMENT_DIALOG = "dialog"
         const val TAG = "CameraQuadrantFragment"
 
@@ -133,6 +133,9 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
     private var isManualFocusSupported = false
     private var maxISO = 100
 
+    private lateinit var vibrator: Vibrator
+    private lateinit var vibratorManager: VibratorManager
+
     private val stateCallback: CameraDevice.StateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(device: CameraDevice) {
             cameraOpenCloseLock.release()
@@ -192,8 +195,8 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
     private val handler by lazy { Handler(Looper.getMainLooper()) }
     private lateinit var runnable: Runnable
 
-    private fun showToast(text: String) {
-        activity?.runOnUiThread { Toast.makeText(activity, text, Toast.LENGTH_SHORT).show() }
+    private fun showFailToast() {
+        activity?.runOnUiThread { Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show() }
     }
 
     override fun onCreateView(
@@ -204,9 +207,18 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            vibratorManager =
+                requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibrator = vibratorManager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator = requireContext().getSystemService(VIBRATOR_SERVICE) as Vibrator
+        }
+
         cameraView = view.findViewById<View>(R.id.cameraView) as CameraView
 
-        reticleView = view.findViewById(R.id.reticleView) as ReticleView
+        reticleView = view.findViewById(R.id.reticleView)!!
         reticleView.setOnClickListener { reticleView.togglePause() }
         reticleView.setZOrderOnTop(true)
     }
@@ -246,7 +258,21 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
         runnable = object : Runnable {
             override fun run() {
                 if (isStable) {
-                    if (!reticleView.isPaused) reticleView.togglePause()
+                    if (!reticleView.isPaused) {
+                        reticleView.togglePause()
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            val vibrationEffect =
+                                VibrationEffect.createOneShot(
+                                    300,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            vibrator.vibrate(vibrationEffect)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            vibrator.vibrate(300)
+                        }
+                    }
                 } else {
                     reticleView.setPosition(pitchZ, rollZ)
                 }
@@ -422,8 +448,8 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
     }
 
     private fun openCamera(width: Int, height: Int) {
-        activity?.applicationContext?.let { _activity ->
-            if (ContextCompat.checkSelfPermission(_activity, Manifest.permission.CAMERA)
+        activity?.applicationContext?.let { context ->
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 requestCameraPermission()
@@ -432,7 +458,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
 
             setUpCameraOutputs(width, height)
             configureTransform(width, height)
-            val manager = _activity.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            val manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
             try {
                 if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                     throw RuntimeException("Time out waiting to lock camera opening.")
@@ -558,7 +584,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
                                     override fun onConfigureFailed(
                                         cameraCaptureSession: CameraCaptureSession
                                     ) {
-                                        showToast("Failed")
+                                        showFailToast()
                                     }
                                 }
                             )
@@ -616,7 +642,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
                                 override fun onConfigureFailed(
                                     cameraCaptureSession: CameraCaptureSession
                                 ) {
-                                    showToast("Failed")
+                                    showFailToast()
                                 }
                             }, null
                         )
@@ -630,12 +656,12 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
     private fun configureTransform(viewWidth: Int, viewHeight: Int) {
         cameraView?.let { view ->
             previewSize?.let { size ->
-                activity?.let { _activity ->
+                activity?.let { fragmentActivity ->
                     val rotation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         context?.display?.rotation
                     } else {
                         @Suppress("DEPRECATION")
-                        _activity.windowManager.defaultDisplay.rotation
+                        fragmentActivity.windowManager.defaultDisplay.rotation
                     }
                     val matrix = Matrix()
                     val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
