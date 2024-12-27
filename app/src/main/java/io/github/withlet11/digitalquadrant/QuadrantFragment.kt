@@ -1,7 +1,7 @@
 /*
  * QuadrantFragment.kt
  *
- * Copyright 2020 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2024 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -96,7 +96,7 @@ open class QuadrantFragment : Fragment(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
             synchronized(pastData) {
-                val xyz =  pastData.removeFirst()
+                val xyz =  pastData.removeAt(0)
                 xyz.x = event.values[0].toDouble()
                 xyz.y = event.values[1].toDouble()
                 xyz.z = event.values[2].toDouble()

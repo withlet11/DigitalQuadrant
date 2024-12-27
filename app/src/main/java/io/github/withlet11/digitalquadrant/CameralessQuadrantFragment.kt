@@ -1,7 +1,7 @@
 /*
  * CameralessQuadrantFragment.kt
  *
- * Copyright 2020-2021 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2024 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -66,14 +66,9 @@ class CameralessQuadrantFragment : QuadrantFragment() {
                     if (!gridView.isPaused) {
                         gridView.pause()
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            val vibrationEffect =
-                                VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE)
-                            vibrator.vibrate(vibrationEffect)
-                        } else {
-                            @Suppress("DEPRECATION")
-                            vibrator.vibrate(300)
-                        }
+                        val vibrationEffect =
+                            VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE)
+                        vibrator.vibrate(vibrationEffect)
                     }
                 } else gridView.setPosition(pitchY, rollY)
                 handler.postDelayed(this, PERIOD)

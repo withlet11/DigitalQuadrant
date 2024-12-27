@@ -1,7 +1,7 @@
 /*
  * MainActivity.kt
  *
- * Copyright 2020-2021 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2024 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,8 +23,6 @@ package io.github.withlet11.digitalquadrant
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
@@ -54,7 +52,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        val switch: SwitchCompat = findViewById(R.id.view_switch)
+        val switch: SwitchCompat = toolbar.findViewById(R.id.view_switch)
         switch.setOnCheckedChangeListener { _, isChecked ->
             tabAdapter.isAutoHoldEnabled = isChecked
         }

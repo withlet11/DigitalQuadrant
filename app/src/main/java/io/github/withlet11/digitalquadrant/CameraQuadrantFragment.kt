@@ -1,7 +1,7 @@
 /*
  * CameraQuadrantFragment.kt
  *
- * Copyright 2020-2021 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2024 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -87,6 +87,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
                     smaller,
                     CompareSizesByArea()
                 )
+
                 else -> {
                     Log.e(TAG, "Couldn't find any suitable preview size")
                     choices[0]
@@ -145,9 +146,9 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
         }
 
         override fun onError(device: CameraDevice, error: Int) {
+            print("onError in CameraQuad...")
             cameraOpenCloseLock.release()
             device.close()
-            cameraDevice = null
             activity?.finish()
         }
     }
@@ -264,26 +265,9 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
             ConfirmationDialog().show(childFragmentManager, FRAGMENT_DIALOG)
         } else {
-            // requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
-
-    /*
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.size != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                ErrorDialog.newInstance(getString(R.string.requestPermission))
-                    .show(childFragmentManager, FRAGMENT_DIALOG)
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-    }
-     */
 
     private fun setUpCameraOutputs(width: Int, height: Int) {
         val manager =
@@ -331,9 +315,11 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
                     Surface.ROTATION_0, Surface.ROTATION_180 -> if (sensorOrientation == 90 || sensorOrientation == 270) {
                         swappedDimensions = true
                     }
+
                     Surface.ROTATION_90, Surface.ROTATION_270 -> if (sensorOrientation == 0 || sensorOrientation == 180) {
                         swappedDimensions = true
                     }
+
                     else -> Log.e(
                         TAG,
                         "Display rotation is invalid: $displayRotation"
@@ -426,8 +412,10 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
                 return
             }
         } catch (e: CameraAccessException) {
+            print("AccessExcep in CameraQuad...")
             e.printStackTrace()
         } catch (e: NullPointerException) {
+            print("NullPointer in CameraQuad...")
             ErrorDialog.newInstance(getString(R.string.cameraError))
                 .show(childFragmentManager, FRAGMENT_DIALOG)
         }
@@ -441,6 +429,7 @@ class CameraQuadrantFragment : QuadrantFragment(), OnRequestPermissionsResultCal
                 requestCameraPermission()
                 return
             }
+
             setUpCameraOutputs(width, height)
             configureTransform(width, height)
             val manager = _activity.getSystemService(Context.CAMERA_SERVICE) as CameraManager
