@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,20 +31,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
 
 sealed interface MainNavigation {
     @Serializable
     data class QuadrantScreen(val index: Int)
 
-    /*
     @Serializable
     object License
 
@@ -52,7 +59,16 @@ sealed interface MainNavigation {
 
     @Serializable
     data class OssLicenseDetails(val name: String, val terms: String)
-     */
+}
+
+class MyViewModel : ViewModel() {
+    private val _isAutoHoldEnabled = MutableStateFlow(false)
+    val isAutoHoldEnabled: StateFlow<Boolean> = _isAutoHoldEnabled.asStateFlow()
+
+    fun toggleAutoHold() {
+        _isAutoHoldEnabled.update { !it }
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,7 +79,7 @@ private fun MainScreenAppBar(
     navigateUp: () -> Unit,
     navController: NavHostController,
     isAutoHoldEnabled: Boolean,
-    toggleAutoHold: () -> Unit,
+    onToggleAutoHold: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -74,22 +90,15 @@ private fun MainScreenAppBar(
         ),
         title = {
             Text(
-                text = stringResource(R.string.app_name),
-                /*
                 text = stringResource(
                     when {
                         currentScreen == null -> R.string.app_name
-                        currentScreen.hasRoute(MainNavigation.MessierObjectDetails::class) -> R.string.messier_objects
-                        currentScreen.hasRoute(MainNavigation.StarDetails::class) -> R.string.stars
-                        currentScreen.hasRoute(MainNavigation.LocationSettings::class) -> R.string.locationSettings
                         currentScreen.hasRoute(MainNavigation.License::class) -> R.string.license
                         currentScreen.hasRoute(MainNavigation.OssLicense::class) -> R.string.opensource_licenses
                         currentScreen.hasRoute(MainNavigation.OssLicenseDetails::class) -> R.string.opensource_licenses
                         else -> R.string.app_name
                     }
                 ),
-
-                 */
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -106,7 +115,7 @@ private fun MainScreenAppBar(
         },
         actions = {
             if (!canNavigateBack) {
-                IconButton(onClick = toggleAutoHold) {
+                IconButton(onClick = onToggleAutoHold) {
                     if (isAutoHoldEnabled) {
                         Icon(
                             Icons.Default.HourglassTop,
@@ -138,7 +147,7 @@ private fun MainScreenAppBar(
                             )
                         },
                         onClick = {
-                            // navController.navigate(MainNavigation.License)
+                            navController.navigate(MainNavigation.License)
                             expanded = false
                         }
                     )
@@ -151,7 +160,7 @@ private fun MainScreenAppBar(
                             )
                         },
                         onClick = {
-                            // navController.navigate(MainNavigation.OssLicense)
+                            navController.navigate(MainNavigation.OssLicense)
                             expanded = false
                         }
                     )
@@ -164,14 +173,15 @@ private fun MainScreenAppBar(
 @Composable
 fun MainScreen(
     context: Context,
+    licensesStateFlow: StateFlow<OssLicenseList>,
     navController: NavHostController = rememberNavController(),
+    myViewModel: MyViewModel = viewModel()
 ) {
+    val isAutoHoldEnabled by myViewModel.isAutoHoldEnabled.collectAsState()
     val vibrator: Vibrator
     val vibratorManager: VibratorManager
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = backStackEntry?.destination
-    var isAutoHoldEnabled by rememberSaveable { mutableStateOf(false) }
-    val onChanged = { isAutoHoldEnabled = !isAutoHoldEnabled }
 
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -190,8 +200,8 @@ fun MainScreen(
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
                 navController = navController,
-                isAutoHoldEnabled = isAutoHoldEnabled,
-                onChanged
+                isAutoHoldEnabled,
+                onToggleAutoHold = { myViewModel.toggleAutoHold() }
             )
         }
     ) { innerPadding ->
@@ -205,53 +215,21 @@ fun MainScreen(
                 QuadrantScreen(index, isAutoHoldEnabled, vibrator)
             }
 
-            /*
-            composable<MainNavigation.StarDetails> { backStackEntry ->
-                val index = backStackEntry.toRoute<MainNavigation.StarDetails>().index
-
-                ObjectDetailScreen(
-                    objectList = starList,
-                    latitude = latitude.doubleValue,
-                    longitude = longitude.doubleValue,
-                    index = index
-                )
-            }
-
-             */
-            /*
-            composable<MainNavigation.LocationSettings> {
-                LocationSettingScreen(
-                    navController = navController,
-                    latitude = latitude,
-                    longitude = longitude
-                )
-            }
-
-             */
-            /*
             composable<MainNavigation.License> {
                 LicenceScreen()
             }
-
-             */
-            /*
             composable<MainNavigation.OssLicense> {
                 OSSLicenseListScreen(
                     navController = navController,
                     licensesStateFlow = licensesStateFlow
                 )
             }
-
-             */
-            /*
             composable<MainNavigation.OssLicenseDetails> { backStackEntry ->
                 val name = backStackEntry.toRoute<MainNavigation.OssLicenseDetails>().name
                 val terms = backStackEntry.toRoute<MainNavigation.OssLicenseDetails>().terms
 
                 OssLicenseDetailScreen(name = name, terms = terms)
             }
-
-             */
         }
     }
 }

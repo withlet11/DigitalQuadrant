@@ -21,6 +21,7 @@
 
 package io.github.withlet11.digitalquadrant
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -29,13 +30,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
-    // private val tabAdapter = TabAdapter(this, false)
+    private val _licensesStateFlow = MutableStateFlow(OssLicenseList(arrayListOf()))
+    private val licensesStateFlow = _licensesStateFlow.asStateFlow()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        createLicenses(this)
 
         setContent {
             MaterialTheme(
@@ -46,66 +55,19 @@ class MainActivity : AppCompatActivity() {
                     secondaryContainer = Color(0xff000040),
                 ),
             ) {
-                MainScreen(LocalContext.current)
+                MainScreen(
+                    LocalContext.current,
+                    licensesStateFlow = licensesStateFlow
+                )
             }
         }
     }
-    /*
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // enableEdgeToEdge()
 
-        setContentView(R.layout.activity_main)
-        val toolbar: Toolbar = findViewById(R.id.my_toolbar)
-        toolbar.setTitle(R.string.app_name)
-        toolbar.inflateMenu(R.menu.menu_main)
-
-        toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.item_licenses -> {
-                    startActivity(Intent(application, LicenseActivity::class.java))
-                }
-                R.id.item_credits -> {
-                    startActivity(Intent(this, OssLicensesMenuActivity::class.java))
-                }
+    private fun createLicenses(context: Context) {
+        lifecycleScope.launch {
+            _licensesStateFlow.update {
+                OssLicenseList.create(context)
             }
-            true
         }
-
-        val switch: SwitchCompat = toolbar.findViewById(R.id.view_switch)
-        switch.setOnCheckedChangeListener { _, isChecked ->
-            tabAdapter.isAutoHoldEnabled = isChecked
-        }
-
-        val pager = findViewById<ViewPager2>(R.id.pager)
-        pager.adapter = tabAdapter
-        // supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
-     */
-
-    /*
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.autoLockCheck -> {
-                item.isChecked = !item.isChecked
-                tabAdapter.isAutoHoldEnabled = item.isChecked
-            }
-            R.id.item_licenses -> {
-                startActivity(Intent(application, LicenseActivity::class.java))
-            }
-            R.id.item_credits -> {
-                startActivity(Intent(this, OssLicensesMenuActivity::class.java))
-            }
-            // android.R.id.home -> finish()
-        }
-
-        return true
-    }
-     */
 }

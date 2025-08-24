@@ -1,7 +1,7 @@
 /*
- * CameraQuadrantFragment.kt
+ * CameraView.kt
  *
- * Copyright 2020-2024 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2025 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,14 +21,14 @@
 
 package io.github.withlet11.digitalquadrant
 
-
 import android.Manifest
 import android.util.Log
 import android.widget.LinearLayout
 import androidx.appcompat.widget.ListPopupWindow.MATCH_PARENT
-import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +42,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -62,15 +63,18 @@ fun MainCamera() {
 }
 
 @Composable
-fun NoPermission(onRequestPermission: () -> Unit) {
+fun NoPermission(
+    onRequestPermission: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     )
     {
         Button(onClick = onRequestPermission) {
-            Text(text = "カメラの許可を与えてください")
+            Text(text = stringResource(id = R.string.requestPermission))
         }
     }
 }
@@ -82,7 +86,11 @@ fun CameraStart() {
     val imageCapture = remember {
         ImageCapture.Builder()
             .setFlashMode(ImageCapture.FLASH_MODE_AUTO)
-            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+            .setResolutionSelector(
+                ResolutionSelector.Builder()
+                    .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                    .build()
+            )
             .build()
     }
     val previewView = PreviewView(context).apply {
@@ -113,9 +121,9 @@ fun CameraStart() {
     }
 
     Box {
-    AndroidView(
-        factory = { previewView },
-        modifier = Modifier.fillMaxSize()
-    )
+        AndroidView(
+            factory = { previewView },
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }

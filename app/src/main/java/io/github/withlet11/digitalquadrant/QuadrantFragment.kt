@@ -37,6 +37,7 @@ import kotlin.math.sqrt
 
 data class SensorXYZ(var x: Double, var y: Double, var z: Double)
 
+/*
 open class QuadrantFragment : Fragment(), SensorEventListener {
     private var sensorX = 0.0
     private var sensorY = 0.0
@@ -136,3 +137,5 @@ open class QuadrantFragment : Fragment(), SensorEventListener {
         isAutoHoldEnabled = enabled
     }
 }
+
+ */
