@@ -8,7 +8,6 @@
     <string name="license">ライセンス</string>
     <string name="opensource_licenses">オープンソースライセンス</string>
     <string name="requestPermission">権限のリクエスト</string>
-    <string name="request_camera_permission">カメラの許可を与えてください</string>
     <string name="description_info">詳細情報</string>
     <string name="intro_message">イントロ</string>
 </resources>

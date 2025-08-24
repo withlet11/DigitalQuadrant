@@ -21,10 +21,16 @@
 
 package io.github.withlet11.digitalquadrant
 
+import android.Manifest
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -36,12 +42,17 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ReticleView(altitude: Float, roll: Float, isPaused: Boolean, modifier: Modifier = Modifier) {
     val drawOutlineColor = Color(127, 95, 79)
@@ -53,100 +64,115 @@ fun ReticleView(altitude: Float, roll: Float, isPaused: Boolean, modifier: Modif
 
     val vectorPainter = rememberVectorPainter(image = vector)
 
+    val permissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
+
     Box {
-        MainCamera()
-        Canvas(
-            modifier = modifier
-                .fillMaxSize()
-        ) {
-            val center = size.width / 2f
-            val middle = size.height / 2f
-            val reticleInside = size.height / 50f
-            val reticleOutside = size.height * 7 / 50f
-            val circleSize = size.height * 4 / 50f
-            val normalTextSize = size.height / 25f
-            val rect = Rect(Offset.Zero, size)
+        if (permissionState.status.isGranted) {
+            MainCamera()
+            Canvas(
+                modifier = modifier
+                    .fillMaxSize()
+            ) {
+                val center = size.width / 2f
+                val middle = size.height / 2f
+                val reticleInside = size.height / 50f
+                val reticleOutside = size.height * 7 / 50f
+                val circleSize = size.height * 4 / 50f
+                val normalTextSize = size.height / 25f
+                val rect = Rect(Offset.Zero, size)
 
-            rotate(-roll, rect.center) {
-                for ((color, lineWidth) in arrayListOf(
-                    Pair(drawOutlineColor, 10f),
-                    Pair(drawColor, 5f)
-                )) {
-                    drawLine(
-                        color = color,
-                        start = Offset(center, middle - reticleOutside),
-                        end = Offset(center, middle - reticleInside),
-                        strokeWidth = lineWidth
-                    )
-                    drawLine(
-                        color = color,
-                        start = Offset(center, middle + reticleInside),
-                        end = Offset(center, middle + reticleOutside),
-                        strokeWidth = lineWidth
-                    )
-                    drawLine(
-                        color = color,
-                        start = Offset(center - reticleOutside, middle),
-                        end = Offset(center - reticleInside, middle),
-                        strokeWidth = lineWidth
-                    )
-                    drawLine(
-                        color = color,
-                        start = Offset(center + reticleInside, middle),
-                        end = Offset(center + reticleOutside, middle),
-                        strokeWidth = lineWidth
-                    )
-                    drawCircle(
-                        color = color,
-                        center = Offset(center, middle),
-                        radius = circleSize,
-                        style = Stroke(width = lineWidth)
-                    )
-
-                    for ((text, textSize) in arrayOf(
-                        "Roll: %6.1f°".format(roll) to 1f,
-                        "Alt: %6.1f°".format(altitude) to 2f
+                rotate(-roll, rect.center) {
+                    for ((color, lineWidth) in arrayListOf(
+                        Pair(drawOutlineColor, 10f),
+                        Pair(drawColor, 5f)
                     )) {
-                        val style = if (color == drawColor) {
-                            TextStyle(
-                                fontSize = (normalTextSize * textSize).toSp(),
-                                color = color,
-                                background = Color.Transparent,
-                            )
-                        } else {
-                            TextStyle(
-                                // font size must be different from that of filled.
-                                fontSize = (normalTextSize * textSize * 0.999f).toSp(),
-                                color = color,
-                                background = Color.Transparent,
-                                drawStyle = Stroke(
-                                    join = StrokeJoin.Round,
-                                    width = 5f,
+                        drawLine(
+                            color = color,
+                            start = Offset(center, middle - reticleOutside),
+                            end = Offset(center, middle - reticleInside),
+                            strokeWidth = lineWidth
+                        )
+                        drawLine(
+                            color = color,
+                            start = Offset(center, middle + reticleInside),
+                            end = Offset(center, middle + reticleOutside),
+                            strokeWidth = lineWidth
+                        )
+                        drawLine(
+                            color = color,
+                            start = Offset(center - reticleOutside, middle),
+                            end = Offset(center - reticleInside, middle),
+                            strokeWidth = lineWidth
+                        )
+                        drawLine(
+                            color = color,
+                            start = Offset(center + reticleInside, middle),
+                            end = Offset(center + reticleOutside, middle),
+                            strokeWidth = lineWidth
+                        )
+                        drawCircle(
+                            color = color,
+                            center = Offset(center, middle),
+                            radius = circleSize,
+                            style = Stroke(width = lineWidth)
+                        )
+
+                        for ((text, textSize) in arrayOf(
+                            "Roll: %6.1f°".format(roll) to 1f,
+                            "Alt: %6.1f°".format(altitude) to 2f
+                        )) {
+                            val style = if (color == drawColor) {
+                                TextStyle(
+                                    fontSize = (normalTextSize * textSize).toSp(),
+                                    color = color,
+                                    background = Color.Transparent,
                                 )
+                            } else {
+                                TextStyle(
+                                    // font size must be different from that of filled.
+                                    fontSize = (normalTextSize * textSize * 0.999f).toSp(),
+                                    color = color,
+                                    background = Color.Transparent,
+                                    drawStyle = Stroke(
+                                        join = StrokeJoin.Round,
+                                        width = 5f,
+                                    )
+                                )
+                            }
+
+                            val measuredText =
+                                textMeasurer.measure(AnnotatedString(text), style = style)
+                            val textWidth = measuredText.size.width
+                            val textHeight = measuredText.size.height
+
+                            drawText(
+                                textMeasurer = textMeasurer,
+                                text = text,
+                                topLeft = Offset(
+                                    (size.width - textWidth) * 0.5f,
+                                    size.height * (6f + textSize) / 10f - textHeight
+                                ),
+                                style = style
                             )
                         }
+                    }
+                }
 
-                        val measuredText =
-                            textMeasurer.measure(AnnotatedString(text), style = style)
-                        val textWidth = measuredText.size.width
-                        val textHeight = measuredText.size.height
-
-                        drawText(
-                            textMeasurer = textMeasurer,
-                            text = text,
-                            topLeft = Offset(
-                                (size.width - textWidth) * 0.5f,
-                                size.height * (6f + textSize) / 10f - textHeight
-                            ),
-                            style = style
-                        )
+                translate(left = size.width * 2 / 5, top = size.height * 17 / 20) {
+                    with(vectorPainter) {
+                        draw(size = Size(size.width / 5, size.width / 5))
                     }
                 }
             }
-
-            translate(left = size.width * 2 / 5, top = size.height * 17 / 20) {
-                with(vectorPainter) {
-                    draw(size = Size(size.width / 5, size.width / 5))
+        } else {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            )
+            {
+                Button(onClick = permissionState::launchPermissionRequest) {
+                    Text(text = stringResource(id = R.string.requestPermission))
                 }
             }
         }

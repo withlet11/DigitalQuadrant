@@ -21,7 +21,6 @@
 
 package io.github.withlet11.digitalquadrant
 
-import android.Manifest
 import android.util.Log
 import android.widget.LinearLayout
 import androidx.appcompat.widget.ListPopupWindow.MATCH_PARENT
@@ -31,56 +30,18 @@ import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainCamera() {
-    val permissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
-
-    if (permissionState.status.isGranted) {
-        CameraStart()
-    } else {
-        NoPermission(onRequestPermission = permissionState::launchPermissionRequest)
-    }
-}
-
-@Composable
-fun NoPermission(
-    onRequestPermission: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    )
-    {
-        Button(onClick = onRequestPermission) {
-            Text(text = stringResource(id = R.string.requestPermission))
-        }
-    }
-}
-
-@Composable
-fun CameraStart() {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val imageCapture = remember {
