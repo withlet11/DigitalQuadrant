@@ -7,8 +7,6 @@ import android.os.VibratorManager
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.HourglassDisabled
-import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -114,19 +112,9 @@ private fun MainScreenAppBar(
         },
         actions = {
             if (!canNavigateBack) {
-                IconButton(onClick = onToggleAutoHold) {
-                    if (isAutoHoldEnabled) {
-                        Icon(
-                            Icons.Default.HourglassTop,
-                            contentDescription = "Auto hold is enabled"
-                        )
-                    } else {
-                        Icon(
-                            Icons.Default.HourglassDisabled,
-                            contentDescription = "Auto hold is disable"
-                        )
-                    }
-                }
+                AutoHoldSwitch(
+                    isChecked = isAutoHoldEnabled,
+                    onCheckedChange = { onToggleAutoHold() })
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
