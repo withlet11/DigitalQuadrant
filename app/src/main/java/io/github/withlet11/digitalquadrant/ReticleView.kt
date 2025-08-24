@@ -21,12 +21,6 @@
 
 package io.github.withlet11.digitalquadrant
 
-import android.content.Context
-import android.graphics.*
-import android.graphics.drawable.Drawable
-import android.util.AttributeSet
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,8 +31,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
@@ -49,8 +41,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.core.content.ContextCompat
-import kotlin.math.truncate
 
 @Composable
 fun Reticle(altitude: Float, roll: Float, isPaused: Boolean, modifier: Modifier = Modifier) {

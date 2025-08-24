@@ -21,9 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
-import java.time.ZonedDateTime
 import java.util.Collections
 import java.util.LinkedList
 import kotlin.math.PI
