@@ -10,10 +10,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <io.github.withlet11.digitalquadrant.GridView
+        <!-- io.github.withlet11.digitalquadrant.GridView
             android:id="@+id/canvas"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" / -->
 
     </LinearLayout>
 

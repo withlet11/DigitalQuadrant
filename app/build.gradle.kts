@@ -2,9 +2,12 @@ import java.util.Properties
 import java.io.FileInputStream
 
 plugins {
+    alias(libs.plugins.compose.compiler) // apply false
     id("com.android.application")
     id("com.google.android.gms.oss-licenses-plugin")
     id("kotlin-android")
+    id("kotlin-kapt")
+    kotlin("plugin.serialization") version "2.1.0"
     // id("kotlin-android-extensions")
 }
 
@@ -28,14 +31,14 @@ android {
         }
     }
 
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "io.github.withlet11.digitalquadrant"
-        minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.3"
+        minSdk = 26
+        versionCode = 5
+        versionName = "1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,32 +50,82 @@ android {
             signingConfig = signingConfigs.getByName("config")
         }
     }
+
+    kotlinOptions {
+        jvmTarget = "21"
+    }
+
+    buildFeatures {
+        viewBinding = true
+        compose = true
+        buildConfig = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.3.2"
+    }
+
     namespace = "io.github.withlet11.digitalquadrant"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 dependencies {
-    val kotlin_version: String by project
-
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-    implementation("androidx.viewpager2:viewpager2:1.1.0")
-    implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
-    implementation("androidx.camera:camera-lifecycle:1.4.1")
-    implementation("androidx.lifecycle:lifecycle-common-jvm:2.8.7")
-    implementation("androidx.camera:camera-view:1.4.1")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+
+    implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.appcompat)
+    // implementation(libs.androidx.camera.bom)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.extensions)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.video)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.lifecycle.common.jvm)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.runtime)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.storage)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.viewpager2)
+    implementation(libs.foundation)
+    implementation(libs.foundation.layout)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.material3)
+    implementation(libs.navigation.compose)
+    implementation(libs.play.services.oss.licenses)
+    implementation(libs.runtime)
+    implementation(libs.runtime.livedata)
+    implementation(libs.ui)
+    implementation(libs.ui.tooling)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+
+
+    // Compose
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
 }

@@ -21,35 +21,35 @@
 
 package io.github.withlet11.digitalquadrant
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.viewpager2.adapter.FragmentStateAdapter
-
-class TabAdapter (fragment: FragmentActivity, enabled: Boolean) : FragmentStateAdapter(fragment) {
-    private var listener1: QuadrantFragment? = null
-    private var listener2: QuadrantFragment? = null
-
-    var isAutoHoldEnabled = enabled
-        set(value) {
-            listener1?.isAutoHoldEnabledChanged(value)
-            listener2?.isAutoHoldEnabledChanged(value)
-            field = value
-        }
-
-    override fun createFragment(position: Int): Fragment =
-        when (position) {
-            0 -> CameralessQuadrantFragment().also {
-                listener1 = it
-            }
-            else -> CameraQuadrantFragment().also {
-                listener2 = it
-            }
-        }.apply {
-            arguments = Bundle().apply {
-                putBoolean("IS_AUTOHOLD_ENABLED", isAutoHoldEnabled)
-            }
-        }
-
-    override fun getItemCount(): Int = 2
-}
+//import android.os.Bundle
+//import androidx.fragment.app.Fragment
+//import androidx.fragment.app.FragmentActivity
+//import androidx.viewpager2.adapter.FragmentStateAdapter
+//
+//class TabAdapter (fragment: FragmentActivity, enabled: Boolean) : FragmentStateAdapter(fragment) {
+//    private var listener1: QuadrantFragment? = null
+//    private var listener2: QuadrantFragment? = null
+//
+//    var isAutoHoldEnabled = enabled
+//        set(value) {
+//            listener1?.isAutoHoldEnabledChanged(value)
+//            listener2?.isAutoHoldEnabledChanged(value)
+//            field = value
+//        }
+//
+//    override fun createFragment(position: Int): Fragment =
+//        when (position) {
+//            0 -> CameralessQuadrantFragment().also {
+//                listener1 = it
+//            }
+//            else -> CameraQuadrantFragment().also {
+//                listener2 = it
+//            }
+//        }.apply {
+//            arguments = Bundle().apply {
+//                putBoolean("IS_AUTOHOLD_ENABLED", isAutoHoldEnabled)
+//            }
+//        }
+//
+//    override fun getItemCount(): Int = 2
+//}

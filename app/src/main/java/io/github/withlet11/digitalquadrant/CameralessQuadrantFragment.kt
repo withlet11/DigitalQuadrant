@@ -21,86 +21,173 @@
 
 package io.github.withlet11.digitalquadrant
 
-import android.content.Context
-import android.content.Context.VIBRATOR_SERVICE
-import android.hardware.Sensor
-import android.os.*
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-
-class CameralessQuadrantFragment : QuadrantFragment() {
-    private lateinit var gridView: GridView
-    private val handler by lazy { Handler(Looper.getMainLooper()) }
-    private lateinit var runnable: Runnable
-    private lateinit var vibrator: Vibrator
-    private lateinit var vibratorManager: VibratorManager
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_cameraless_quadrant, container, false)
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        gridView = view.findViewById(R.id.canvas)
-        gridView.setOnClickListener { gridView.togglePause() }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            vibratorManager =
-                requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            vibrator = vibratorManager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            vibrator = requireContext().getSystemService(VIBRATOR_SERVICE) as Vibrator
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        timerSet()
-    }
-
-    override fun onPause() {
-        stopTimerTask()
-        super.onPause()
-    }
-
-    private fun timerSet() {
-        runnable = object : Runnable {
-            override fun run() {
-                if (isStable) {
-                    if (!gridView.isPaused) {
-                        gridView.pause()
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            val vibrationEffect =
-                                VibrationEffect.createOneShot(
-                                    300,
-                                    VibrationEffect.DEFAULT_AMPLITUDE
-                                )
-                            vibrator.vibrate(vibrationEffect)
-                        } else {
-                            @Suppress("DEPRECATION")
-                            vibrator.vibrate(300)
-                        }
-                    }
-                } else {
-                    gridView.setPosition(pitchY, rollY)
-                }
-                handler.postDelayed(this, PERIOD)
-            }
-        }
-        handler.post(runnable)
-    }
-
-    private fun stopTimerTask() {
-        handler.removeCallbacks(runnable)
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-
-    }
-}
+//import android.content.Context
+//import android.content.Context.VIBRATOR_SERVICE
+//import android.hardware.Sensor
+//import android.os.*
+//import android.util.Log
+//import android.view.LayoutInflater
+//import android.view.View
+//import android.view.ViewGroup
+//import androidx.compose.foundation.clickable
+//import androidx.compose.foundation.layout.Box
+//import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.material3.Surface
+//import androidx.compose.material3.Text
+//import androidx.compose.runtime.DisposableEffect
+//import androidx.compose.runtime.LaunchedEffect
+//import androidx.compose.runtime.MutableState
+//import androidx.compose.runtime.collectAsState
+//import androidx.compose.runtime.getValue
+//import androidx.compose.runtime.mutableFloatStateOf
+//import androidx.compose.runtime.mutableStateOf
+//import androidx.compose.runtime.remember
+//import androidx.compose.runtime.setValue
+//import androidx.compose.ui.Modifier
+//import androidx.compose.ui.platform.ComposeView
+//import androidx.compose.ui.platform.ViewCompositionStrategy
+//import androidx.lifecycle.Lifecycle
+//import androidx.lifecycle.LifecycleEventObserver
+//import androidx.lifecycle.compose.LifecycleResumeEffect
+//import androidx.lifecycle.compose.LocalLifecycleOwner
+//import kotlinx.coroutines.delay
+//import java.time.ZonedDateTime
+//
+//class CameralessQuadrantFragment : QuadrantFragment() {
+//    private val handler by lazy { Handler(Looper.getMainLooper()) }
+//    private lateinit var runnable: Runnable
+//    private lateinit var vibrator: Vibrator
+//    private lateinit var vibratorManager: VibratorManager
+//
+//    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View {
+//        return ComposeView(requireContext()).apply {
+//            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+//            setContent {
+//                var pitch by remember { mutableFloatStateOf(0f) }
+//                var roll by remember { mutableFloatStateOf(0f) }
+//                var isPaused by remember { mutableStateOf<Boolean>(false) }
+//
+//                /*
+//                val onRun = fun() {
+//                    if (isStable) {
+//                        if (!isPaused) {
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                                val vibrationEffect =
+//                                    VibrationEffect.createOneShot(
+//                                        300,
+//                                        VibrationEffect.DEFAULT_AMPLITUDE
+//                                    )
+//                                vibrator.vibrate(vibrationEffect)
+//                            } else {
+//                                @Suppress("DEPRECATION")
+//                                vibrator.vibrate(300)
+//                            }
+//
+//                            isPaused = true
+//                        }
+//                    } else {
+//                        if (!isPaused) {
+//                            pitch = pitchY
+//                            roll = rollY
+//                        }
+//                    }
+//                }
+//
+//                 */
+//
+//                val lifecycleOwner = LocalLifecycleOwner.current
+//                val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+//                LifecycleResumeEffect(lifecycleState) {
+//                    /*
+//                    setTimer(object : Runnable {
+//                        override fun run() {
+//                            onRun()
+//                            handler.postDelayed(this, PERIOD)
+//                        }
+//                    })
+//                     */
+//
+//                    onPauseOrDispose {
+//                        // stopTimerTask()
+//                    }
+//                }
+//
+//                LaunchedEffect(Unit) {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                        vibratorManager =
+//                            requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+//                        vibrator = vibratorManager.defaultVibrator
+//                    } else {
+//                        @Suppress("DEPRECATION")
+//                        vibrator = requireContext().getSystemService(VIBRATOR_SERVICE) as Vibrator
+//                    }
+//
+//                    /*
+//                    setTimer(object : Runnable {
+//                        override fun run() {
+//                            onRun()
+//                            handler.postDelayed(this, PERIOD)
+//                        }
+//                    })
+//                     */
+//                }
+//
+//                GridView(
+//                    pitch = pitch, roll = roll, isPaused = isPaused,
+//                    modifier = Modifier.clickable(onClick = { isPaused = !isPaused })
+//                )
+//            }
+//        }
+//    }
+//    /*
+//    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View? = inflater.inflate(R.layout.fragment_cameraless_quadrant, container, false)
+//
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        gridView = view.findViewById(R.id.canvas)
+//        gridView.setOnClickListener { gridView.togglePause() }
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//            vibratorManager =
+//                requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+//            vibrator = vibratorManager.defaultVibrator
+//        } else {
+//            @Suppress("DEPRECATION")
+//            vibrator = requireContext().getSystemService(VIBRATOR_SERVICE) as Vibrator
+//        }
+//    }
+//
+//    override fun onResume() {
+//        super.onResume()
+//        timerSet()
+//    }
+//
+//    override fun onPause() {
+//        stopTimerTask()
+//        super.onPause()
+//    }
+//     */
+//
+//    private fun setTimer(runnable: Runnable) {
+//        this.runnable = runnable
+//        handler.post(runnable)
+//    }
+//
+//    private fun stopTimerTask() {
+//        handler.removeCallbacks(runnable)
+//    }
+//
+//    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+//
+//    }
+//
+//}

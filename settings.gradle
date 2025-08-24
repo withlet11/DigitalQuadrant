@@ -1,2 +1,20 @@
+// settings.gradle
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google() // Essential for AndroidX and Google libraries
+        mavenCentral() // Essential for many other libraries
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS) // Recommended for consistency
+    repositories {
+        google() // <--- ADD THIS LINE
+        mavenCentral() // <--- ADD THIS LINE
+    }
+}
+
 include ':app'
 rootProject.name = "Digital Quadrant"

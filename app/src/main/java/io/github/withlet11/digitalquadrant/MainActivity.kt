@@ -1,7 +1,7 @@
 /*
  * MainActivity.kt
  *
- * Copyright 2020-2024 Yasuhiro Yamakawa <withlet11@gmail.com>
+ * Copyright 2020-2025 Yasuhiro Yamakawa <withlet11@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,19 +21,50 @@
 
 package io.github.withlet11.digitalquadrant
 
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.Vibrator
+import android.os.VibratorManager
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 class MainActivity : AppCompatActivity() {
-    private val tabAdapter = TabAdapter(this, false)
+    // private val tabAdapter = TabAdapter(this, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        setContent {
+            MaterialTheme(
+                colorScheme = darkColorScheme(
+                    primary = Color(0xffd0d0e0),
+                    secondary = Color(0xff8080c0),
+                    primaryContainer = Color(0xff000080),
+                    secondaryContainer = Color(0xff000040),
+                ),
+            ) {
+                MainScreen(LocalContext.current)
+            }
+        }
+    }
+    /*
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // enableEdgeToEdge()
 
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.my_toolbar)
@@ -61,6 +92,8 @@ class MainActivity : AppCompatActivity() {
         pager.adapter = tabAdapter
         // supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
+
+     */
 
     /*
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
