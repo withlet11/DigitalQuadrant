@@ -21,25 +21,14 @@
 
 package io.github.withlet11.digitalquadrant
 
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.Vibrator
-import android.os.VibratorManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
-import androidx.appcompat.widget.Toolbar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 class MainActivity : AppCompatActivity() {
     // private val tabAdapter = TabAdapter(this, false)
