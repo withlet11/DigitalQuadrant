@@ -30,6 +30,7 @@ import kotlin.math.atan
 import kotlin.math.sign
 import kotlin.math.sqrt
 
+data class SensorXYZ(var x: Double, var y: Double, var z: Double)
 @Composable
 fun QuadrantScreen(
     index: Int,
@@ -48,9 +49,7 @@ fun QuadrantScreen(
     var pitchZ by remember { mutableFloatStateOf(0f) }
     var rollZ by remember { mutableFloatStateOf(0f) }
     var isPaused by remember { mutableStateOf(false) }
-    var sensorX = 0.0
-    var sensorY = 0.0
-    var sensorZ = 0.0
+
     val accelerateSensorEventListener = remember(isAutoHoldEnabled) {
         object : SensorEventListener {
             override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
@@ -67,9 +66,9 @@ fun QuadrantScreen(
                         xyz.y = event.values[1].toDouble()
                         xyz.z = event.values[2].toDouble()
                         pastData.add(xyz)
-                        sensorX = pastData.map { it.x }.average()
-                        sensorY = pastData.map { it.y }.average()
-                        sensorZ = pastData.map { it.z }.average()
+                        val sensorX = pastData.map { it.x }.average()
+                        val sensorY = pastData.map { it.y }.average()
+                        val sensorZ = pastData.map { it.z }.average()
 
                         if (isStable(sensorX, sensorY, sensorZ, pastData)) {
                             if (isAutoHoldEnabled && !isPaused) {
@@ -139,7 +138,7 @@ fun QuadrantScreen(
 
     DisposableEffect(sensorManager, accelerateSensor, accelerateSensorEventListener) {
         synchronized(pastData) {
-            for (i in 1..10) {
+            repeat(10) {
                 pastData.add(SensorXYZ(0.0, 0.0, 0.0))
             }
         }
@@ -155,8 +154,6 @@ fun QuadrantScreen(
         }
     }
 
-    val PERIOD = 100L
-
     Surface {
         HorizontalPager(
             state = pagerState,
@@ -170,7 +167,7 @@ fun QuadrantScreen(
                         indication = null, onClick = { isPaused = !isPaused })
                 )
 
-                else -> Reticle(
+                else -> ReticleView(
                     altitude = -pitchZ, roll = -rollZ, isPaused = isPaused,
                     modifier = Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
