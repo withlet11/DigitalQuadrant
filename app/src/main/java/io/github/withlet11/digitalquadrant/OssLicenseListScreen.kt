@@ -53,7 +53,7 @@ fun OSSLicenseListScreen(
                 navController.navigate(
                     MainNavigation.OssLicenseDetails(
                         name = it.name,
-                        terms = it.terms
+                        terms = it.licenseText
                     )
                 )
             }) {
@@ -61,7 +61,7 @@ fun OSSLicenseListScreen(
                 Text(text = it.name, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = it.terms,
+                    text = it.licenseText,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis

@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 
 data class OssLicenseList(val licenseList: List<LibraryLicense>) :
     List<LibraryLicense> by licenseList {
@@ -20,33 +21,39 @@ data class OssLicenseList(val licenseList: List<LibraryLicense>) :
             return OssLicenseList(licenses)
         }
 
-        private suspend fun loadLibraries(context: Context): List<Library> {
+        private suspend fun loadLibraries(context: Context): List<LibraryMetadata> {
             return withContext(Dispatchers.IO) {
-                val inputSteam =
-                    context.resources.openRawResource(R.raw.third_party_license_metadata)
-                inputSteam.use { stream ->
-                    val reader = BufferedReader(InputStreamReader(stream, "UTF-8"))
-                    reader.use { bufferedReader ->
-                        val libraries = mutableListOf<Library>()
-                        while (true) {
-                            val line = bufferedReader.readLine() ?: break
-                            val (position, name) = line.split(' ', limit = 2)
-                            val (offset, length) = position.split(':').map { it.toInt() }
-                            libraries.add(Library(name, offset, length))
+                context.resources.openRawResource(R.raw.third_party_license_metadata)
+                    .use { inputSteam ->
+                        BufferedReader(
+                            InputStreamReader(
+                                inputSteam,
+                                StandardCharsets.UTF_8
+                            )
+                        ).use { bufferedReader ->
+                            val libraries = mutableListOf<LibraryMetadata>()
+                            while (true) {
+                                val line = bufferedReader.readLine() ?: break
+                                val (position, name) = line.split(' ', limit = 2)
+                                val (offset, length) = position.split(':').map { it.toInt() }
+                                libraries.add(LibraryMetadata(name, offset, length))
+                            }
+                            libraries.toList()
                         }
-                        libraries.toList()
                     }
-                }
             }
         }
 
-        private suspend fun loadLicense(context: Context, library: Library): String {
+        private suspend fun loadLicense(context: Context, library: LibraryMetadata): String {
             return withContext(Dispatchers.IO) {
                 val charArray = CharArray(library.length)
-                val inputStream = context.resources.openRawResource(R.raw.third_party_licenses)
-                inputStream.use { stream ->
-                    val bufferedReader = BufferedReader(InputStreamReader(stream, "UTF-8"))
-                    bufferedReader.use { reader ->
+                context.resources.openRawResource(R.raw.third_party_licenses).use { stream ->
+                    BufferedReader(
+                        InputStreamReader(
+                            stream,
+                            StandardCharsets.UTF_8
+                        )
+                    ).use { reader ->
                         reader.skip(library.offset.toLong())
                         reader.read(charArray, 0, library.length)
                     }
@@ -57,7 +64,7 @@ data class OssLicenseList(val licenseList: List<LibraryLicense>) :
     }
 }
 
-data class Library(
+data class LibraryMetadata(
     val name: String,
     val offset: Int,
     val length: Int
@@ -65,5 +72,5 @@ data class Library(
 
 data class LibraryLicense(
     val name: String,
-    val terms: String
+    val licenseText: String
 )
