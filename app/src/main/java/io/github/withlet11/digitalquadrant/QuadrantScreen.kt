@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import java.lang.System.currentTimeMillis
 import java.util.Collections
 import java.util.LinkedList
 import kotlin.math.PI
@@ -31,6 +32,7 @@ import kotlin.math.sign
 import kotlin.math.sqrt
 
 data class SensorXYZ(var x: Double, var y: Double, var z: Double)
+
 @Composable
 fun QuadrantScreen(
     index: Int,
@@ -49,6 +51,7 @@ fun QuadrantScreen(
     var pitchZ by remember { mutableFloatStateOf(0f) }
     var rollZ by remember { mutableFloatStateOf(0f) }
     var isPaused by remember { mutableStateOf(false) }
+    var lastExecutedTime = 0L
 
     val accelerateSensorEventListener = remember(isAutoHoldEnabled) {
         object : SensorEventListener {
@@ -57,6 +60,11 @@ fun QuadrantScreen(
 
             override fun onSensorChanged(event: SensorEvent) {
                 if (!isPaused && event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+                    val currentTime = currentTimeMillis()
+                    if (currentTime - lastExecutedTime < 150) return
+
+                    lastExecutedTime = currentTime
+
                     synchronized(pastData) {
                         if (pastData.isEmpty()) {
                             return

@@ -33,11 +33,11 @@ android {
         }
     }
 
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "io.github.withlet11.digitalquadrant"
-        targetSdk = 35
+        targetSdk = 36
         minSdk = 26
         versionCode = 5
         versionName = "1.4"
