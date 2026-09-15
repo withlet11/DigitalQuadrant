@@ -195,27 +195,36 @@ fun MainScreen(
         NavHost(
             navController,
             startDestination = MainNavigation.QuadrantScreen(0),
-            modifier = Modifier.padding(innerPadding),
         ) {
             composable<MainNavigation.QuadrantScreen> { backStackEntry ->
                 val index = backStackEntry.toRoute<MainNavigation.QuadrantScreen>().index
-                QuadrantScreen(index, isAutoHoldEnabled, vibrator)
+                QuadrantScreen(
+                    index,
+                    isAutoHoldEnabled,
+                    vibrator,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
 
             composable<MainNavigation.License> {
-                LicenceScreen()
+                LicenceScreen(modifier = Modifier.padding(innerPadding))
             }
             composable<MainNavigation.OssLicense> {
                 OSSLicenseListScreen(
                     navController = navController,
-                    licensesStateFlow = licensesStateFlow
+                    licensesStateFlow = licensesStateFlow,
+                    contentPadding = innerPadding
                 )
             }
             composable<MainNavigation.OssLicenseDetails> { backStackEntry ->
                 val name = backStackEntry.toRoute<MainNavigation.OssLicenseDetails>().name
                 val terms = backStackEntry.toRoute<MainNavigation.OssLicenseDetails>().terms
 
-                OssLicenseDetailScreen(name = name, terms = terms)
+                OssLicenseDetailScreen(
+                    name = name,
+                    terms = terms,
+                    contentPadding = innerPadding
+                )
             }
         }
     }

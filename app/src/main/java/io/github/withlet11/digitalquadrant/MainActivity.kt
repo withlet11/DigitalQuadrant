@@ -22,6 +22,7 @@
 package io.github.withlet11.digitalquadrant
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -41,8 +42,11 @@ class MainActivity : AppCompatActivity() {
     private val licensesStateFlow = _licensesStateFlow.asStateFlow()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
+        super.onCreate(savedInstanceState)
 
         createLicenses(this)
 

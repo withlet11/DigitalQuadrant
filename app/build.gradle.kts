@@ -1,5 +1,5 @@
-@file:Suppress("UnstableApiUsage")
-
+import com.android.build.api.dsl.ApplicationExtension
+import org.gradle.kotlin.dsl.androidTestImplementation
 import java.util.Properties
 import java.io.FileInputStream
 
@@ -23,7 +23,7 @@ val keystoreProperties = Properties()
 // Load your keystore.properties file into the keystoreProperties object.
 keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
-android {
+configure<ApplicationExtension> {
     signingConfigs {
         create("config") {
             keyAlias = keystoreProperties["keyAlias"] as String
@@ -37,10 +37,10 @@ android {
 
     defaultConfig {
         applicationId = "io.github.withlet11.digitalquadrant"
-        targetSdk = 36
+        targetSdk = 37
         minSdk = 26
-        versionCode = 5
-        versionName = "1.4"
+        versionCode = 7
+        versionName = "1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -52,10 +52,6 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("config")
         }
-    }
-
-    kotlinOptions {
-        jvmTarget = "21"
     }
 
     buildFeatures {
@@ -100,6 +96,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3)
+    implementation(libs.material)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.livedata)
@@ -108,26 +105,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.viewpager2)
-    implementation(libs.foundation)
-    implementation(libs.foundation.layout)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlin.stdlib)
-    implementation(libs.material3)
     implementation(libs.navigation.compose)
-    implementation(libs.play.services.oss.licenses)
-    implementation(libs.runtime)
-    implementation(libs.runtime.livedata)
-    implementation(libs.ui)
-    implementation(libs.ui.tooling)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-
-    // Compose
-    val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
 }

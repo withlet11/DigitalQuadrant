@@ -35,11 +35,11 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun LicenceScreen() {
+fun LicenceScreen(modifier: Modifier = Modifier) {
     val scrollState = rememberScrollState()
 
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .verticalScroll(scrollState)
             .padding(12.dp)
     ) {

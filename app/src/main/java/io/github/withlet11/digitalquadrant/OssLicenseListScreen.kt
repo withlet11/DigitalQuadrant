@@ -23,7 +23,10 @@ package io.github.withlet11.digitalquadrant
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -44,11 +48,21 @@ import kotlinx.coroutines.flow.StateFlow
 fun OSSLicenseListScreen(
     navController: NavHostController,
     licensesStateFlow: StateFlow<OssLicenseList>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val licensesState by licensesStateFlow.collectAsState()
-    LazyColumn(modifier = modifier.padding(4.dp)) {
-        items(licensesState) {
+    val layoutDirection = LocalLayoutDirection.current
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(
+            start = contentPadding.calculateStartPadding(layoutDirection) + 4.dp,
+            top = contentPadding.calculateTopPadding() + 4.dp,
+            end = contentPadding.calculateEndPadding(layoutDirection) + 4.dp,
+            bottom = contentPadding.calculateBottomPadding() + 4.dp
+        )
+    ) {
+        items(licensesState.licenseList) {
             Column(modifier = Modifier.clickable {
                 navController.navigate(
                     MainNavigation.OssLicenseDetails(

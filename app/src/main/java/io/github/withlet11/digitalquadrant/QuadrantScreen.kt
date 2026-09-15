@@ -37,7 +37,8 @@ data class SensorXYZ(var x: Double, var y: Double, var z: Double)
 fun QuadrantScreen(
     index: Int,
     isAutoHoldEnabled: Boolean,
-    vibrator: Vibrator
+    vibrator: Vibrator,
+    modifier: Modifier = Modifier
 ) {
     val pagerState =
         rememberPagerState(pageCount = { 2 }, initialPage = index)
@@ -162,7 +163,7 @@ fun QuadrantScreen(
         }
     }
 
-    Surface {
+    Surface(modifier = modifier) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize()

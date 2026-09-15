@@ -22,6 +22,7 @@
 package io.github.withlet11.digitalquadrant
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
@@ -41,9 +42,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun OssLicenseDetailScreen(
     name: String,
-    terms: String
+    terms: String,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    Surface(modifier = Modifier.padding(12.dp)) {
+    Surface(
+        modifier = Modifier
+            .padding(contentPadding)
+            .padding(12.dp)
+    ) {
         val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
